@@ -28,7 +28,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm start
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
