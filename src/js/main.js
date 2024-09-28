@@ -45,6 +45,7 @@ function renderPageNavigation(){
         continue;
     }
     const row = document.createElement('li');
+    if(i==page)row.classList.add('active');
     row.classList.add('page-item');
     const link = document.createElement('a');
     link.innerHTML = `${i}`;
