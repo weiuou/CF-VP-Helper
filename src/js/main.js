@@ -127,9 +127,9 @@ addButton.addEventListener('click', () => {
 });
 
 pageButton.addEventListener('click',()=>{
-  const _pageSize = parseInt(pageSizeInputField.value.trim());
+  let _pageSize = parseInt(pageSizeInputField.value.trim());
   pageSizeInputField.value = '';
-  if(_pageSize <= 0)_pageSize = 50;
+  if(_pageSize <= 0)_pageSize = 24;
   setPage(1,_pageSize);
 });
 
