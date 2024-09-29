@@ -3,17 +3,20 @@ import {getContestList} from './api.js'
 import * as bootstrap from 'bootstrap'
 let users = [
 ];
+
+let contests = await getContestList();
+let activeContests = contests;
 const userList = document.getElementById('user-list');
 const contestList = document.getElementById('contest-list');
 const pageNavigation = document.getElementById('page-navigation');
 let page = 1;
 let len = 24;
-
+setActiveContests('All');
 function setPage(_page,_len){
   page = _page;
   len = _len;
   if(page < 1)page = 1;
-  let maxPage =(contests.length%len > 0) ? contests.length    /len+1 : contests.length/len;
+  let maxPage =(activeContests.length%len > 0) ? activeContests.length    /len+1 : activeContests.length/len;
   if(page > maxPage)page = maxPage;
   renderContests();
   renderPageNavigation();
@@ -21,7 +24,7 @@ function setPage(_page,_len){
 
 function renderPageNavigation(){
   pageNavigation.innerHTML = '';
-  let maxPage =(contests.length%len > 0) ? contests.length/len+1 : contests.length/len;
+  let maxPage =(activeContests.length%len > 0) ? activeContests.length/len+1 : activeContests.length/len;
   console.log(maxPage);
   const previous = document.createElement('li');
   previous.classList.add('page-item');
@@ -68,13 +71,13 @@ function renderContests(){
   contestList.innerHTML = '';
   const begin = len * (page - 1);
   const end = begin + len;
-  for(let i = begin;i < end && i < contests.length;i++){
-    let id = contests[i].id;
-    let name = contests[i].name;
-    let startTime = TimeSecondToTime(contests[i].startTimeSeconds);
-    let duration = TimeSecondToDuration(contests[i].durationSeconds);
-    let link = "https://codeforces.com/contests/"+ contests[i].id;
-    let phase = contests[i].phase;
+  for(let i = begin;i < end && i < activeContests.length;i++){
+    let id = activeContests[i].id;
+    let name = activeContests[i].name;
+    let startTime = TimeSecondToTime(activeContests[i].startTimeSeconds);
+    let duration = TimeSecondToDuration(activeContests[i].durationSeconds);
+    let link = "https://codeforces.com/contests/"+ activeContests[i].id;
+    let phase = activeContests[i].phase;
     const row = document.createElement('tr');
     row.innerHTML = `<th scope="row">${id}</th>
       <th>${name}</th>
@@ -85,6 +88,25 @@ function renderContests(){
     contestList.appendChild(row);
   }
 }
+function initButton(){
+  const d1button = document.getElementById('div1');
+  const d12button = document.getElementById('div1+2');
+  const d2button = document.getElementById('div2');
+  const edubutton = document.getElementById('edu');
+  const d3button = document.getElementById('div3');
+  const d4button = document.getElementById('div4');
+  const allbutton = document.getElementById('All');
+  d1button.addEventListener('click',()=> setActiveContests('(Div. 1)'));
+  d12button.addEventListener('click',()=> setActiveContests('(Div. 1 + Div. 2)'));
+  edubutton.addEventListener('click',()=> setActiveContests('Educational'));
+  d2button.addEventListener('click',()=> setActiveContests('(Div. 2)'));
+  d3button.addEventListener('click',()=> setActiveContests('(Div. 3)'));
+  d4button.addEventListener('click',()=> setActiveContests('(Div. 4)'));
+  allbutton.addEventListener('click',()=> setActiveContests('All'));
+
+
+}
+initButton();
 
 function renderUsers(){
   userList.innerHTML = '';
@@ -135,7 +157,6 @@ pageButton.addEventListener('click',()=>{
 });
 
 
-let contests = await getContestList();
 setPage(page,len);
 function TimeSecondToTime(second){
   const date = new Date(second * 1000);
@@ -156,7 +177,12 @@ function TimeSecondToDuration(second){
 	return `${hours}:${minutes}`;
 }
 
-
+function setActiveContests(name){
+	console.log(name);
+  if(name!=='All')activeContests = contests.filter(item => item.name.includes(name));
+  else activeContests = contests;
+  setPage(1,len);
+}
 
 
 
