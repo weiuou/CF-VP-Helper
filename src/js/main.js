@@ -1,5 +1,5 @@
 import '../scss/styles.scss'
-import {getContestList} from './api.js'
+import {getContestList, getHandleInfo, getTitlePhoto} from './api.js'
 import * as bootstrap from 'bootstrap'
 let users = [
 ];
@@ -83,7 +83,7 @@ function renderContests(){
       <th>${name}</th>
       <th>${startTime}</th>
       <th>${duration}</th>
-      <th><a href="${link}">跳转到cf</a></th>
+      <th><a href="${link}">🔗</a></th>
       <th>${phase}</th>`;
     contestList.appendChild(row);
   }
@@ -108,18 +108,41 @@ function initButton(){
 }
 initButton();
 
+function getColor(rank){
+  if(rank == "international grandmaster")return 'rgb(255, 0, 0)';
+  if(rank == "grandmaster")return "rgb(255, 0, 0)";
+  if(rank == "international master")return "rgb(255, 140, 0)";
+  if(rank == "master")return "rgb(255, 140, 0)";
+  if(rank == "candidate master")return "rgb(170, 0, 170)";
+  if(rank == "expert")return "rgb(0, 0, 255)";
+  if(rank == "specialist")return "rgb(3, 168, 158)";
+  if(rank == "pupil")return "rgb(0, 128, 0)";
+  if(rank == "newbie")return "rgb(128, 128, 128)";
+}
+
+
 function renderUsers(){
   userList.innerHTML = '';
   users.forEach(user =>{
     const row = document.createElement('li');
     row.classList.add('list-group-item');
-    row.innerHTML = `${user.name}`;
+    const name = document.createElement('span');
+    name.textContent = user.name;
+    name.style.color = getColor(user.rank);
+    name.style.width = '50%';
+    name.style.fontWeight = 'bold';
+    const titlePhoto = document.createElement('img');
+    titlePhoto.src = user.titlePhoto;
+    titlePhoto.style.width = '30%';
+    titlePhoto.style.aspectRatio = '1/1';
     const removeButton = document.createElement('button');
     removeButton.type = "button";
     removeButton.classList.add('btn','btn-light');
     removeButton.innerText = '移除';
     removeButton.addEventListener('click',()=> removeUser(user.name));
-    row.appendChild(removeButton)
+    row.appendChild(titlePhoto);
+    row.appendChild(name);
+    row.appendChild(removeButton);
     userList.appendChild(row);
   });
 }
@@ -128,12 +151,17 @@ function removeUser(name){
   renderUsers();
 }
 
-function AddUser(name){
-  users.push({name:name});
+async function AddUser(name){
+  let User = await getHandleInfo(name);
+  if (User.length == 0)return;
+  const base64img = await getTitlePhoto(User[0].titlePhoto);
+  console.log(base64img);
+  users.push({name:name,
+    rank:User[0].rank,
+    titlePhoto: await getTitlePhoto(User[0].titlePhoto)
+  });
   renderUsers();
 }
-
-renderUsers();
 
 const pageSizeInputField = document.getElementById('pageSize-input');
 const inputField = document.getElementById('id-input');
