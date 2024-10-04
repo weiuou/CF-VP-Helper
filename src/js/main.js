@@ -1,9 +1,8 @@
 import '../scss/styles.scss'
-import {getContestList, getHandleInfo, getTitlePhoto} from './api.js'
+import {getContestList, getHandleInfo, getTitlePhoto, getInvalidContests} from './api.js'
 import * as bootstrap from 'bootstrap'
-let users = [
-];
-
+let users = [];
+let invalidContests = [];
 let contests = await getContestList();
 let activeContests = contests;
 const userList = document.getElementById('user-list');
@@ -89,6 +88,7 @@ function renderContests(){
   }
 }
 function initButton(){
+  const addbutton = document.getElementById('applyButton');
   const d1button = document.getElementById('div1');
   const d12button = document.getElementById('div1+2');
   const d2button = document.getElementById('div2');
@@ -96,6 +96,7 @@ function initButton(){
   const d3button = document.getElementById('div3');
   const d4button = document.getElementById('div4');
   const allbutton = document.getElementById('All');
+  addbutton.addEventListener('click',()=> setInvalidContests());
   d1button.addEventListener('click',()=> setActiveContests('(Div. 1)'));
   d12button.addEventListener('click',()=> setActiveContests('(Div. 1 + Div. 2)'));
   edubutton.addEventListener('click',()=> setActiveContests('Educational'));
@@ -206,11 +207,34 @@ function TimeSecondToDuration(second){
 }
 
 function setActiveContests(name){
-	console.log(name);
-  if(name!=='All')activeContests = contests.filter(item => item.name.includes(name));
-  else activeContests = contests;
+  activeContests = activeContests.filter(item => !invalidContests.includes(item.id));
+  if(name!=='All'&&name!==''){
+    activeContests = contests.filter(item => !invalidContests.includes(item.id));
+    activeContests = activeContests.filter(item => item.name.includes(name));
+  }
+  if(name=='All')activeContests = contests.filter(item => !invalidContests.includes(item.id));
   setPage(1,len);
 }
-
-
+function sleep(ms){
+  return new Promise(resolve => setTimeout(resolve,ms));
+}
+async function setInvalidContests(){
+  invalidContests = [];
+  let promises = [];
+  for(const user of users){
+    await sleep(500);
+    promises.push((async() =>{
+      try{
+        const tmpContests = await getInvalidContests(user.name);
+	invalidContests = invalidContests.concat(tmpContests).filter((item, index, self) => self.indexOf(item) === index);
+      } catch(error){
+        console.error(error);
+      }
+    })());
+  };
+  await Promise.all(promises);
+  console.log(invalidContests);
+  setActiveContests('');
+  renderContests();
+}
 

@@ -55,10 +55,12 @@
       <div class="card" style="width: 100%;">
         <div class="card-header">用户</div>
 	<div class="card-body">
+	  <p>（由于CFapi有调用频率上限，在用户多时筛选速度会很慢，请多等待几秒~）</p>
           <ul class="list-group list-group-flush" id="user-list"></ul>
 	  <div class="input-group mb-3">
 	    <input type="text" id="id-input" class="form-control" placeholder="Codeforces ID" aria-label="Codeforces ID" aria-describedby="button-addon2">
             <button class="btn btn-outline-secondary" type="button" id="AddButton">添加用户</button>
+	    <button class="btn btn-outline-secondary" type="button" id="applyButton">apply</button>
 	  </div>
         </div>
     </div>

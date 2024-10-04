@@ -48,3 +48,17 @@ export const getTitlePhoto = (url) => {
     });
   });
 };
+export const getInvalidContests = (name) => {
+  return axios.get('https://codeforces.com/api/user.status?handle='+name+'&from=1&count=1000000')
+  .then(response =>{
+    let data = response.data.result;
+    const invalidContests = data.map(tmp => tmp.contestId).filter((contestId,index,self) => self.indexOf(contestId)===index);
+    return invalidContests;
+  })
+  .catch(error=>{
+    console.error(error);
+    throw new Error(error);
+  });
+
+};
+
